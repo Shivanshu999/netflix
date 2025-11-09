@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "netflix",
   "private": true,
   "scripts": {
     "build": "turbo run build",
