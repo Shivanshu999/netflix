@@ -9,7 +9,11 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "@prisma/client": "^6.19.0",
     "prettier": "^3.6.2",
+    "prisma": "^6.19.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "turbo": "^2.6.0",
     "typescript": "5.9.2"
   },
@@ -19,6 +23,12 @@
   "packageManager": "npm@11.4.2",
   "workspaces": [
     "apps/*",
-    "packages/*"
-  ]
+    "db"
+  ],
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  }
 }

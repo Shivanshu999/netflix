@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    /* === File Structure === */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* === Module System (Node.js ESM compatible) === */
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* === Environment === */
+    "lib": ["ESNext"],
+    "types": ["node"],
+
+    /* === Output Options === */
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    /* === Strictness === */
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+
+    /* === Performance / Behavior === */
+    "isolatedModules": true,
+    "moduleDetection": "force"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

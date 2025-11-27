@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// DataSource property URL is no longer supported in schema files. Move connection URLs from migrate to prisma.conflicts.ts. Pass either adapter for direct database connection or accelerate URL for accelerate to the Prisma client constructors. See https://prs.ly/d/conflict-config-ps 
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  refresh_token_expires_in Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Movie {
+  id            Int         @id @default(autoincrement())
+  imageString   String
+  title         String
+  age           Int
+  duration      Float
+  overview      String
+  release       Int
+  videoSource   String
+  category      String
+  youtubeString String
+  WatchLists    WatchList[]
+  createdAt     DateTime    @default(now())
+} 
+
+model WatchList {
+  id     String @id @default(uuid())
+  userId String
+
+  Movie   Movie? @relation(fields: [movieId], references: [id])
+  movieId Int?
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id                    Int          @id @default(autoincrement())
+  userId                String       @unique
+  planId                String
+  isActive              Boolean      @default(true)
+  autoRenew             Boolean      @default(true)
+  expiresAt              DateTime
+  trialEndsAt           DateTime?
+  razorpaySubscriptionId String?     @unique
+  razorpayCustomerId    String?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  invoices              Invoice[]
+  transactions          Transaction[]
+}
+
+model Transaction {
+  id         Int      @id @default(autoincrement())
+  paymentId  String   @unique
+  userId     String
+  planId     String
+  amount     Int
+  status     String
+  invoiceId  Int?
+  invoice    Invoice? @relation(fields: [invoiceId], references: [id])
+  subscriptionId Int?
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  retryCount Int      @default(0)
+  meta       Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Invoice {
+  id            Int          @id @default(autoincrement())
+  invoiceNumber String       @unique
+  userId        String
+  subscriptionId Int
+  subscription  Subscription @relation(fields: [subscriptionId], references: [id])
+  planId        String
+  amount        Int
+  currency      String       @default("INR")
+  status        String       // "pending", "paid", "failed", "refunded"
+  paymentId     String?
+  transactions  Transaction[]
+  pdfUrl        String?
+  emailedAt     DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model PaymentMethod {
+  id                Int      @id @default(autoincrement())
+  userId            String
+  razorpayCustomerId String
+  razorpayPaymentMethodId String?
+  isDefault         Boolean  @default(false)
+  last4             String?
+  brand             String?  // "visa", "mastercard", etc.
+  expiresAt         DateTime?
+  meta              Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, razorpayCustomerId])
+}
+
+model PaymentLog {
+  id            Int      @id @default(autoincrement())
+  userId        String?
+  paymentId     String?
+  orderId       String?
+  eventType     String   // "payment.attempt", "webhook.received", "subscription.renewed", etc.
+  status        String   // "success", "failed", "pending"
+  gatewayResponse Json?
+  errorMessage String?  @db.Text
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([paymentId])
+  @@index([eventType])
+  @@index([createdAt])
+}
