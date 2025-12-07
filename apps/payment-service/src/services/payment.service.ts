@@ -1,4 +1,4 @@
-import { razorpayClient, RAZORPAY_CONFIG } from "../config/razorpay.config.js";
+import { razorpayClient } from "../config/razorpay.config.js";
 import { verifySignature } from "../utils/crypto.utils.js";
 import { config } from "../config/env.config.js";
 import { publishPaymentEvent } from "./rabbitmq.service.js";
@@ -17,6 +17,7 @@ interface VerifySignatureParams {
   razorpay_payment_id: string;
   razorpay_signature: string;
 }
+
 
 /**
  * ================================
@@ -161,7 +162,7 @@ export async function handlePaymentWebhook(event: string, payload: any) {
     paymentId: paymentEntity.id,
     userId: paymentEntity.notes?.userId ?? "unknown",
     planId: paymentEntity.notes?.planId ?? "unknown",
-    amount: Number(paymentEntity.amount) / 100, // FIXED
+    amount: Number(paymentEntity.amount) / 100, 
     currency: paymentEntity.currency,
     orderId: paymentEntity.order_id,
     timestamp: new Date().toISOString(),

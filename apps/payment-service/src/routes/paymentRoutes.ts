@@ -1,16 +1,3 @@
-// import express from 'express';
-// import { createOrder, verifyPayment } from '../controllers/paymentController.js';
-
-// const router = express.Router();
-
-// // Route to create a Razorpay order
-// router.post('/create-order', createOrder);
-
-// // Route to verify Razorpay payment
-// router.post('/verify-payment', verifyPayment);
-
-// export default router;
-
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { config } from '../config/env.config.js';
@@ -68,11 +55,5 @@ router.post(
   verifyWebhookSignature,
   handleWebhook
 );
-
-// Get Payment Status
-router.get('/payment/:orderId', async (req, res) => {
-  // TODO: Implement
-  res.json({ message: 'Get payment status' });
-});
 
 export { router as paymentRoutes };

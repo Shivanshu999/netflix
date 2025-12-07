@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,7 +5,9 @@ import dotenv from 'dotenv';
 import { config } from './config/env.config.js';
 import { paymentRoutes } from './routes/paymentRoutes.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
-import { logger } from './utils/logger.utils.js';
+import { metricsMiddleware } from './middleware/metrics.middleware.js';
+import { getMetrics } from './controllers/metrics.controller.js';
+import { logger } from './utils/logger.utils.js'; 
 import { initRabbitMQ } from './services/rabbitmq.service.js';
 import { setupAutoRenewCron } from './cron/auto-renew.cron.js';
 
@@ -27,6 +28,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Metrics Middleware (before other middleware to capture all requests)
+app.use(metricsMiddleware);
+
 // Request Logging
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.path}`, {
@@ -45,6 +49,9 @@ app.get('/health', (req, res) => {
     uptime: process.uptime(),
   });
 });
+
+// Prometheus Metrics Endpoint
+app.get('/metrics', getMetrics);
 
 // API Routes
 app.use(config.apiPrefix, paymentRoutes);

@@ -1,19 +1,3 @@
-// import dotenv from "dotenv";
-// dotenv.config();
-// import Razorpay from "razorpay"
-
-
-
-// if (!process.env.RAZOR_PAY_TEST_API_KEY || !process.env.RAZOR_PAY_TEST_KEY_SECRET) {
-//   throw new Error("Razorpay API keys are missing in environment variables");
-// }
-
-// export const razorpayInstance = new Razorpay({
-//   key_id: process.env.RAZOR_PAY_TEST_API_KEY,
-//   key_secret: process.env.RAZOR_PAY_TEST_KEY_SECRET,
-// });
-
-
 import Razorpay from 'razorpay';
 import { config } from './env.config.js';
 

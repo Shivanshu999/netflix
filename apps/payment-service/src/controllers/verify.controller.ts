@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyPaymentSignature } from '../services/payment.service.js';
 import { logger } from '../utils/logger.utils.js';
+import { paymentVerifications } from '../utils/metrics.utils.js';
 import type { VerifyPaymentRequest } from '../types/payment.types.js';
 
 export async function verifyPayment(
@@ -21,6 +22,9 @@ export async function verifyPayment(
       razorpay_payment_id,
       razorpay_signature,
     });
+
+    // Track metrics
+    paymentVerifications.inc({ status: result.verified ? 'success' : 'failed' });
 
     res.status(200).json({
       success: result.verified,

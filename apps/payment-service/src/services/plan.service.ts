@@ -64,42 +64,5 @@ export function getAllPlans(): SubscriptionPlan[] {
   return Object.values(SUBSCRIPTION_PLANS);
 }
 
-/**
- * Calculate upgrade price when user has already paid for monthly subscription
- * Returns the discounted amount for yearly plan (yearly price - remaining monthly value)
- */
-export function calculateUpgradePrice(
-  currentPlan: PlanId,
-  newPlan: PlanId,
-  currentExpiresAt: Date
-): { amount: number; discount: number; originalAmount: number } {
-  if (currentPlan === "yearly" || newPlan === "monthly") {
-    // No upgrade discount for these cases
-    const plan = getPlan(newPlan);
-    if (!plan) {
-      throw new Error(`Invalid plan: ${newPlan}`);
-    }
-    return {
-      amount: plan.amount,
-      discount: 0,
-      originalAmount: plan.amount,
-    };
-  }
 
-  // Monthly → Yearly upgrade
-  const now = new Date();
-  const timeRemaining = currentExpiresAt.getTime() - now.getTime();
-  const daysRemaining = Math.max(0, Math.ceil(timeRemaining / (1000 * 60 * 60 * 24)));
-  const monthsRemaining = daysRemaining / 30;
 
-  const monthlyPlan = SUBSCRIPTION_PLANS.monthly;
-  const yearlyPlan = SUBSCRIPTION_PLANS.yearly;
-  const remainingValue = Math.round(monthlyPlan.amount * monthsRemaining);
-  const discountedAmount = Math.max(0, yearlyPlan.amount - remainingValue);
-
-  return {
-    amount: discountedAmount,
-    discount: remainingValue,
-    originalAmount: yearlyPlan.amount,
-  };
-}

@@ -1,8 +1,8 @@
-
 import { Request, Response, NextFunction } from 'express';
 import { createPaymentOrder } from '../services/payment.service.js';
 import { getPlan, isValidPlanId } from '../services/plan.service.js';
 import { logger } from '../utils/logger.utils.js';
+import { paymentOrdersCreated, paymentOrdersAmount } from '../utils/metrics.utils.js';
 import type { CreateOrderRequest } from '../types/payment.types.js';
 
 export async function createOrder(
@@ -50,11 +50,19 @@ export async function createOrder(
       currency: finalCurrency,
     });
 
+    // Track metrics
+    paymentOrdersCreated.inc({ plan_id: planId, status: 'success' });
+    paymentOrdersAmount.observe({ plan_id: planId, currency: finalCurrency }, finalAmount);
+
     res.status(200).json({
       success: true,
       data: order,
     });
   } catch (error) {
+    // Track failed orders
+    const planId = req.body?.planId || 'unknown';
+    paymentOrdersCreated.inc({ plan_id: planId, status: 'failed' });
+    
     logger.error('Error creating order:', error);
     next(error);
   }

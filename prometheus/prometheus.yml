@@ -1,0 +1,48 @@
+# prometheus/prometheus.yml
+global:
+  scrape_interval: 15s # How frequently to scrape targets
+  evaluation_interval: 15s # How frequently to evaluate rules
+  external_labels:
+    cluster: 'netflix-cluster'
+    environment: 'development'
+
+# Alertmanager configuration (optional - for future use)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# Load rules once and periodically evaluate them (optional)
+# rule_files:
+#   - "alert_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Payment Service
+  - job_name: 'payment-service'
+    static_configs:
+      # Try host.docker.internal first (for Docker on Mac/Windows)
+      # If that doesn't work, use the host IP or add payment-service to docker-compose network
+      - targets: ['host.docker.internal:4000', 'localhost:4000']
+        labels:
+          service: 'payment-service'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # RabbitMQ (via management plugin)
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692'] # RabbitMQ Prometheus plugin port
+    scrape_interval: 30s
+
+  # PostgreSQL (if you add postgres_exporter)
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+

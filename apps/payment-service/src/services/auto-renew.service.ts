@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { razorpayClient } from "../config/razorpay.config.js";
-import { config } from "../config/env.config.js";
 import { publishPaymentEvent } from "./rabbitmq.service.js";
 import { logger } from "../utils/logger.utils.js";
 

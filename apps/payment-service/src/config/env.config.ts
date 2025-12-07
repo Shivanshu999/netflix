@@ -17,7 +17,6 @@ function required(name: string): string {
   }
   return value;
 }
-
 export const config = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT || 3002),

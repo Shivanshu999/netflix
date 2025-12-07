@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { cancelRazorpaySubscription } from '../services/subscription.service.js';
 import { logger } from '../utils/logger.utils.js';
+import { subscriptionCancellations } from '../utils/metrics.utils.js';
 
 /**
  * Cancel Razorpay subscription
@@ -22,6 +23,9 @@ export async function cancelSubscription(
 
     const result = await cancelRazorpaySubscription(subscriptionId);
 
+    // Track metrics
+    subscriptionCancellations.inc();
+
     res.status(200).json({
       success: true,
       message: 'Subscription cancelled successfully',
@@ -32,6 +36,8 @@ export async function cancelSubscription(
     next(error);
   }
 }
+
+
 
 
 

@@ -12,8 +12,12 @@ async function main() {
           duration: 2.15,
           overview:
             "The ultimate wish-fulfillment tale of a teenage Gran Turismo player whose gaming skills won him a series of Nissan competitions to become an actual professional racecar driver.",
+          // Legacy MP4 fallback
           videoSource:
             "https://utfs.io/f/916e1354-a1b6-4832-97ab-9fa95876b91a-bnyedt.mp4",
+          // Demo HLS manifest – in a real setup this would be your own origin/CDN
+          manifestUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+          cdnProvider: "demo-mux",
           imageString:
             "https://image.tmdb.org/t/p/original/r7DuyYJ0N3cD8bRKsR5Ygq2P7oa.jpg",
           release: 2023,
