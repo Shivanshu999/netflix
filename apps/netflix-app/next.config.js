@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true, // <-- THIS FIXES YOUR VERCEL BUILD
+    ignoreDuringBuilds: true, // 
   },
 
   images: {
