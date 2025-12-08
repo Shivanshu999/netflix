@@ -3,6 +3,13 @@ node_modules/
 .pnp
 .pnp.js
 
+# Next.js build output (IMPORTANT!)
+.next/
+out/
+
+# Turborepo cache (IMPORTANT!)
+.turbo/
+
 # Testing
 coverage/
 
