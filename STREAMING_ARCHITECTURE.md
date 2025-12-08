@@ -117,3 +117,5 @@ If asked “What would you change for real Netflix scale?” you can mention:
 This architecture gives you a solid, realistic story while keeping the implementation manageable in a personal project.
 
 
+
+

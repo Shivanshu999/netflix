@@ -12,14 +12,15 @@ const planIds = ["monthly", "yearly"] as const;
 export const createOrderSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
   planId: z.enum(planIds, {
-    errorMap: () => ({ message: "Invalid plan ID" }),
+    // either a simple string:
+    // error: "Invalid plan ID",
+
+    // or a Zod error map function returning { message: string }:
+    error: () => ({ message: "Invalid plan ID" }),
   }),
-  // Amount is now calculated by backend, not sent from frontend
-  // Optional for upgrade scenarios where custom amount might be needed
   amount: z.number().positive("Amount must be positive").optional(),
   currency: z.string().optional().default("INR"),
 });
-
 export const verifyPaymentSchema = z.object({
   razorpay_order_id: z.string().min(1, "Order ID is required"),
   razorpay_payment_id: z.string().min(1, "Payment ID is required"),
