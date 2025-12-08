@@ -43,8 +43,10 @@ export function SubscribeClient({
   autoRenew = true,
 }: SubscribeClientProps) {
   // If user has monthly plan, default to yearly (upgrade)
-  const defaultPlan = isActive && currentPlan === "monthly" ? "yearly" : "monthly";
-  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanId>(defaultPlan);
+  const defaultPlan =
+    isActive && currentPlan === "monthly" ? "yearly" : "monthly";
+  const [selectedPlan, setSelectedPlan] =
+    useState<SubscriptionPlanId>(defaultPlan);
   const [scriptReady, setScriptReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
@@ -63,11 +65,15 @@ export function SubscribeClient({
       try {
         const response = await fetch("/api/subscription/plans");
         const data = await response.json();
-        
+
         if (response.ok && data.success && data.data) {
           setPlans(data.data);
         } else {
-          console.error("Failed to fetch plans:", data.message || "Unknown error", data);
+          console.error(
+            "Failed to fetch plans:",
+            data.message || "Unknown error",
+            data
+          );
           // Don't set plans, so error message will show
         }
       } catch (error) {
@@ -84,7 +90,7 @@ export function SubscribeClient({
   // Create plans map for easy lookup
   const plansMap = useMemo(() => {
     const map: Record<string, SubscriptionPlan> = {};
-    plans.forEach(plan => {
+    plans.forEach((plan) => {
       map[plan.id] = plan;
     });
     return map;
@@ -138,7 +144,9 @@ export function SubscribeClient({
       router.push("/home");
     } catch (error) {
       console.error("Subscription cancel failed:", error);
-      alert(error instanceof Error ? error.message : "Unable to cancel membership");
+      alert(
+        error instanceof Error ? error.message : "Unable to cancel membership"
+      );
     } finally {
       setCancelLoading(false);
     }
@@ -152,8 +160,11 @@ export function SubscribeClient({
 
     try {
       // Check if this is an upgrade (user has monthly, selecting yearly)
-      const isUpgrade = isActive && currentPlan === "monthly" && selectedPlan === "yearly";
-      const endpoint = isUpgrade ? "/api/subscription/upgrade" : "/api/subscription/checkout";
+      const isUpgrade =
+        isActive && currentPlan === "monthly" && selectedPlan === "yearly";
+      const endpoint = isUpgrade
+        ? "/api/subscription/upgrade"
+        : "/api/subscription/checkout";
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -192,9 +203,10 @@ export function SubscribeClient({
         amount: displayAmount,
         currency: order.currency,
         name: "MovieVerse Subscription",
-        description: isUpgrade && upgradeDiscount
-          ? `Upgrade to ${plan.label} - Save ₹${upgradeDiscount.discount.toLocaleString("en-IN")}!`
-          : plan.tagline,
+        description:
+          isUpgrade && upgradeDiscount
+            ? `Upgrade to ${plan.label} - Save ₹${upgradeDiscount.discount.toLocaleString("en-IN")}!`
+            : plan.tagline,
         order_id: order.orderId,
         handler: async function (checkoutResponse: any) {
           try {
@@ -254,26 +266,32 @@ export function SubscribeClient({
   // Calculate upgrade discount if user has monthly and is viewing yearly
   // This will be calculated by backend, but we show it here for UI preview
   const upgradeDiscount = useMemo(() => {
-    if (!isActive || !currentPlan || !currentEndsAt || plans.length === 0) return null;
+    if (!isActive || !currentPlan || !currentEndsAt || plans.length === 0)
+      return null;
     if (currentPlan !== "monthly") return null;
-    
+
     const monthlyPlan = plansMap["monthly"];
     const yearlyPlan = plansMap["yearly"];
     if (!monthlyPlan || !yearlyPlan) return null;
-    
+
     const now = new Date();
     const timeRemaining = new Date(currentEndsAt).getTime() - now.getTime();
-    const daysRemaining = Math.max(0, Math.ceil(timeRemaining / (1000 * 60 * 60 * 24)));
+    const daysRemaining = Math.max(
+      0,
+      Math.ceil(timeRemaining / (1000 * 60 * 60 * 24))
+    );
     const monthsRemaining = daysRemaining / 30;
-    
+
     const remainingValue = Math.round(monthlyPlan.amount * monthsRemaining);
     const discountedAmount = Math.max(0, yearlyPlan.amount - remainingValue);
-    
-    return remainingValue > 0 ? {
-      amount: discountedAmount,
-      discount: remainingValue,
-      originalAmount: yearlyPlan.amount,
-    } : null;
+
+    return remainingValue > 0
+      ? {
+          amount: discountedAmount,
+          discount: remainingValue,
+          originalAmount: yearlyPlan.amount,
+        }
+      : null;
   }, [isActive, currentPlan, currentEndsAt, plans, plansMap]);
 
   if (plansLoading) {
@@ -287,9 +305,12 @@ export function SubscribeClient({
   if (plans.length === 0 && !plansLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <p className="text-red-400 text-lg font-semibold">Failed to load subscription plans</p>
+        <p className="text-red-400 text-lg font-semibold">
+          Failed to load subscription plans
+        </p>
         <p className="text-white/70 text-sm">
-          The payment service may not be running. Please ensure the payment service is started.
+          The payment service may not be running. Please ensure the payment
+          service is started.
         </p>
         <button
           onClick={() => window.location.reload()}
@@ -315,21 +336,23 @@ export function SubscribeClient({
           const isSelected = plan.id === selectedPlan;
           // Disable monthly if user already has monthly subscription
           // Disable both plans if user has yearly subscription
-          const isDisabled = 
+          const isDisabled =
             (isActive && currentPlan === "monthly" && plan.id === "monthly") ||
             (isActive && currentPlan === "yearly");
-          const isUpgradeOption = isActive && currentPlan === "monthly" && plan.id === "yearly";
-          const isCurrentYearlyPlan = isActive && currentPlan === "yearly" && plan.id === "yearly";
-          
+          const isUpgradeOption =
+            isActive && currentPlan === "monthly" && plan.id === "yearly";
+          const isCurrentYearlyPlan =
+            isActive && currentPlan === "yearly" && plan.id === "yearly";
+
           return (
             <button
               key={plan.id}
               className={`rounded-2xl border p-6 text-left transition ${
-                isDisabled 
+                isDisabled
                   ? "border-gray-600 bg-gray-900/50 cursor-not-allowed opacity-50"
-                  : isSelected 
-                  ? "border-white bg-white/5 hover:border-white" 
-                  : "border-white/10 hover:border-white"
+                  : isSelected
+                    ? "border-white bg-white/5 hover:border-white"
+                    : "border-white/10 hover:border-white"
               }`}
               onClick={() => !isDisabled && setSelectedPlan(plan.id)}
               type="button"
@@ -362,11 +385,14 @@ export function SubscribeClient({
               </div>
               <p className="mt-2 text-sm text-white/70">{plan.interval}</p>
               <div className="mt-4">
-                {isUpgradeOption && upgradeDiscount && upgradeDiscount.discount > 0 ? (
+                {isUpgradeOption &&
+                upgradeDiscount &&
+                upgradeDiscount.discount > 0 ? (
                   <>
                     <div className="flex items-baseline gap-2">
                       <p className="text-2xl font-normal text-white/50 line-through">
-                        ₹{upgradeDiscount.originalAmount.toLocaleString("en-IN")}
+                        ₹
+                        {upgradeDiscount.originalAmount.toLocaleString("en-IN")}
                       </p>
                       <p className="text-4xl font-bold text-emerald-400">
                         ₹{upgradeDiscount.amount.toLocaleString("en-IN")}
@@ -386,11 +412,14 @@ export function SubscribeClient({
                 )}
               </div>
               <p className="mt-2 text-sm text-white/70">{plan.tagline}</p>
-              {isUpgradeOption && upgradeDiscount && upgradeDiscount.discount > 0 && (
-                <p className="mt-2 text-xs text-emerald-400">
-                  Discount applied based on your remaining monthly subscription value
-                </p>
-              )}
+              {isUpgradeOption &&
+                upgradeDiscount &&
+                upgradeDiscount.discount > 0 && (
+                  <p className="mt-2 text-xs text-emerald-400">
+                    Discount applied based on your remaining monthly
+                    subscription value
+                  </p>
+                )}
               <ul className="mt-6 space-y-2 text-sm text-white/80">
                 {plan.perks.map((perk) => (
                   <li key={perk} className="flex items-center gap-2">
@@ -404,18 +433,28 @@ export function SubscribeClient({
         })}
       </div>
 
-      {isActive && currentPlan === "monthly" && selectedPlan === "yearly" && upgradeDiscount && upgradeDiscount.discount > 0 && (
-        <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-          <p className="font-semibold">✨ Upgrade Discount Available!</p>
-          <p className="text-xs mt-1">
-            You'll save ₹{upgradeDiscount.discount.toLocaleString("en-IN")} based on your remaining monthly subscription value.
-          </p>
-          <p className="text-xs mt-1">
-            Original Yearly Price: ₹{upgradeDiscount.originalAmount.toLocaleString("en-IN")} → 
-            Your Price: ₹{upgradeDiscount.amount.toLocaleString("en-IN")}
-          </p>
-        </div>
-      )}
+      {isActive &&
+        currentPlan === "monthly" &&
+        selectedPlan === "yearly" &&
+        upgradeDiscount &&
+        upgradeDiscount.discount > 0 && (
+          <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+            <p className="font-semibold">✨ Upgrade Discount Available!</p>
+            <p className="text-xs mt-1">
+              You&apos;re already enjoying all the benefits of our yearly
+              subscription. Your plan is active until{" "}
+              {currentEndsAt
+                ? new Date(currentEndsAt).toLocaleDateString()
+                : "the end of your billing period"}
+              .
+            </p>
+            <p className="text-xs mt-1">
+              Original Yearly Price: ₹
+              {upgradeDiscount.originalAmount.toLocaleString("en-IN")} → Your
+              Price: ₹{upgradeDiscount.amount.toLocaleString("en-IN")}
+            </p>
+          </div>
+        )}
 
       {/* Only show payment button if user doesn't have yearly subscription */}
       {!(isActive && currentPlan === "yearly") && (
@@ -423,22 +462,33 @@ export function SubscribeClient({
           size="lg"
           className="w-full bg-red-600 text-lg hover:bg-red-500"
           onClick={handleSubscribe}
-          disabled={!scriptReady || loading || (isActive && currentPlan === "monthly" && selectedPlan === "monthly")}
+          disabled={
+            !scriptReady ||
+            loading ||
+            (isActive &&
+              currentPlan === "monthly" &&
+              selectedPlan === "monthly")
+          }
         >
-          {loading 
-            ? "Processing..." 
+          {loading
+            ? "Processing..."
             : isActive && currentPlan === "monthly" && selectedPlan === "yearly"
-            ? "Upgrade to Yearly Plan"
-            : "Continue to payment"}
+              ? "Upgrade to Yearly Plan"
+              : "Continue to payment"}
         </Button>
       )}
 
       {/* Show message for yearly subscribers */}
       {isActive && currentPlan === "yearly" && (
         <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-          <p className="font-semibold">✨ You're on the Yearly Plan!</p>
+          <p className="font-semibold">✨ You&apos;re on the Yearly Plan!</p>
           <p className="text-xs mt-1">
-            You're already enjoying all the benefits of our yearly subscription. Your plan is active until {currentEndsAt ? new Date(currentEndsAt).toLocaleDateString() : "the end of your billing period"}.
+            You&apos;re already enjoying all the benefits of our yearly
+            subscription. Your plan is active until{" "}
+            {currentEndsAt
+              ? new Date(currentEndsAt).toLocaleDateString()
+              : "the end of your billing period"}
+            .
           </p>
         </div>
       )}
@@ -464,7 +514,12 @@ export function SubscribeClient({
           <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200">
             <p className="font-semibold">Membership Cancelled</p>
             <p className="text-xs mt-1">
-              Your membership has been cancelled. You can continue enjoying the service until {currentEndsAt ? new Date(currentEndsAt).toLocaleDateString() : "your subscription expires"}, but you will not be charged again.
+              Your membership has been cancelled. You can continue enjoying the
+              service until{" "}
+              {currentEndsAt
+                ? new Date(currentEndsAt).toLocaleDateString()
+                : "your subscription expires"}
+              , but you will not be charged again.
             </p>
           </div>
         </div>
@@ -472,7 +527,3 @@ export function SubscribeClient({
     </div>
   );
 }
-
-
-
-

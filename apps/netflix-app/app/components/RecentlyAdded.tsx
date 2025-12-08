@@ -3,6 +3,21 @@ import { prisma } from "@/lib/prisma";
 import { MovieCard } from "./MovieCard";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
+// Define the type for your movie data
+type MovieData = {
+  id: number;
+  overview: string;
+  title: string;
+  imageString: string;
+  youtubeString: string;
+  age: number;
+  release: number;
+  duration: number;
+  WatchLists: {
+    id: string;
+  }[];
+};
+
 async function getData(userId: string) {
   const data = await prisma.movie.findMany({
     select: {
@@ -30,16 +45,14 @@ async function getData(userId: string) {
 }
 
 export default async function RecentlyAdded() {
-  // ✅ Get current Kinde user
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
-  // ✅ Use user.id instead of email (Kinde uses unique ID)
   const data = await getData(user?.id as string);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-8 gap-6">
-      {data.map((movie) => (
+      {data.map((movie: MovieData) => (
         <div key={movie.id} className="relative h-48">
           {/* Movie poster */}
           <Image

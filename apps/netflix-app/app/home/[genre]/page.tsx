@@ -2,7 +2,10 @@ import { MovieCard } from "@/app/components/MovieCard";
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import {
+  LoginLink,
+  RegisterLink,
+} from "@kinde-oss/kinde-auth-nextjs/components";
 
 async function getData(userId: string) {
   const data = await prisma.watchList.findMany({
@@ -92,8 +95,8 @@ export default async function Watchlist() {
                     overview={movie.Movie?.overview as string}
                     time={movie.Movie?.duration as number}
                     title={movie.Movie?.title as string}
-                    wachtListId={movie.Movie?.WatchLists[0]?.id as string}
-                    watchList={movie.Movie?.WatchLists.length > 0}
+                    wachtListId={movie.Movie?.WatchLists?.[0]?.id as string}
+                    watchList={(movie.Movie?.WatchLists?.length ?? 0) > 0}
                     year={movie.Movie?.release as number}
                     youtubeUrl={movie.Movie?.youtubeString as string}
                   />

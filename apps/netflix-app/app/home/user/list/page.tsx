@@ -91,7 +91,7 @@ export default async function Watchlist() {
                     time={movie.Movie?.duration as number}
                     title={movie.Movie?.title as string}
                     wachtListId={movie.Movie?.WatchLists[0]?.id as string}
-                    watchList={movie.Movie?.WatchLists.length > 0}
+                    watchList={(movie.Movie?.WatchLists?.length ?? 0) > 0}
                     year={movie.Movie?.release as number}
                     youtubeUrl={movie.Movie?.youtubeString as string}
                   />
