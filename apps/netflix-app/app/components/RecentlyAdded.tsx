@@ -18,8 +18,8 @@ type MovieData = {
   }[];
 };
 
-async function getData(userId: string) {
-  const data = await prisma.movie.findMany({
+async function getData(userId: string): Promise<MovieData[]> {
+  return prisma.movie.findMany({
     select: {
       id: true,
       overview: true,
@@ -29,7 +29,7 @@ async function getData(userId: string) {
           userId: userId,
         },
       },
-      imageString: true, 
+      imageString: true,
       youtubeString: true,
       age: true,
       release: true,
@@ -40,9 +40,8 @@ async function getData(userId: string) {
     },
     take: 4,
   });
-
-  return data;
 }
+
 
 export default async function RecentlyAdded() {
   const { getUser } = getKindeServerSession();
