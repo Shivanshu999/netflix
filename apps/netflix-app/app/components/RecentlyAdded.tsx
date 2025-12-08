@@ -47,7 +47,8 @@ export default async function RecentlyAdded() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
-  const data = await getData(user?.id as string);
+  const data: MovieData[] = await getData(user?.id as string);
+
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-8 gap-6">
