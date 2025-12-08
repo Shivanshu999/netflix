@@ -4,21 +4,36 @@ import Image from "next/image";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
 
-async function getData(userId: string) {
+// Correct type for one watchlist entry
+type WatchlistMovie = {
+  Movie: {
+    id: number;
+    title: string;
+    age: number;
+    duration: number;
+    imageString: string;
+    overview: string;
+    release: number;
+    youtubeString: string;
+    WatchLists: { id: string }[];
+  } | null;
+};
+
+async function getData(userId: string): Promise<WatchlistMovie[]> {
   return prisma.watchList.findMany({
     where: { userId },
     select: {
       Movie: {
         select: {
+          id: true,
           title: true,
           age: true,
           duration: true,
           imageString: true,
           overview: true,
           release: true,
-          id: true,
-          WatchLists: true,
           youtubeString: true,
+          WatchLists: true,
         },
       },
     },
@@ -29,7 +44,7 @@ export default async function Watchlist() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
-  // ✅ If no user, show login/register buttons instead of redirecting
+  // If not logged in
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-white">
@@ -49,7 +64,7 @@ export default async function Watchlist() {
     );
   }
 
-  const data = await getData(user.id); // Use Kinde's user.id
+  const data: WatchlistMovie[] = await getData(user.id);
 
   return (
     <>
@@ -63,42 +78,48 @@ export default async function Watchlist() {
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-5 sm:px-0 mt-10 gap-6">
-          {data.map((movie) => (
-            <div key={movie.Movie?.id} className="relative h-60">
-              <Image
-                src={movie.Movie?.imageString as string}
-                alt={movie.Movie?.title || "Movie"}
-                width={500}
-                height={400}
-                className="rounded-sm absolute w-full h-full object-cover"
-              />
+          {data.map((movie: WatchlistMovie) => {
+            // Handle null Movie
+            if (!movie.Movie) return null;
 
-              <div className="h-60 relative z-10 w-full transform transition duration-500 hover:scale-125 opacity-0 hover:opacity-100">
-                <div className="bg-gradient-to-b from-transparent via-black/50 to-black z-10 w-full h-full rounded-lg flex items-center justify-center">
-                  <Image
-                    src={movie.Movie?.imageString as string}
-                    alt={movie.Movie?.title || "Movie"}
-                    width={800}
-                    height={800}
-                    className="absolute w-full h-full -z-10 rounded-lg object-cover"
-                  />
+            return (
+              <div key={movie.Movie.id} className="relative h-60">
+                <Image
+                  src={movie.Movie.imageString}
+                  alt={movie.Movie.title}
+                  width={500}
+                  height={400}
+                  className="rounded-sm absolute w-full h-full object-cover"
+                />
 
-                  <MovieCard
-                    key={movie.Movie?.id}
-                    age={movie.Movie?.age as number}
-                    movieId={movie.Movie?.id as number}
-                    overview={movie.Movie?.overview as string}
-                    time={movie.Movie?.duration as number}
-                    title={movie.Movie?.title as string}
-                    wachtListId={movie.Movie?.WatchLists[0]?.id as string}
-                    watchList={(movie.Movie?.WatchLists?.length ?? 0) > 0}
-                    year={movie.Movie?.release as number}
-                    youtubeUrl={movie.Movie?.youtubeString as string}
-                  />
+                <div className="h-60 relative z-10 w-full transform transition duration-500 hover:scale-125 opacity-0 hover:opacity-100">
+                  <div className="bg-gradient-to-b from-transparent via-black/50 to-black z-10 w-full h-full rounded-lg flex items-center justify-center">
+                    
+                    <Image
+                      src={movie.Movie.imageString}
+                      alt={movie.Movie.title}
+                      width={800}
+                      height={800}
+                      className="absolute w-full h-full -z-10 rounded-lg object-cover"
+                    />
+
+                    <MovieCard
+                      key={movie.Movie.id}
+                      age={movie.Movie.age}
+                      movieId={movie.Movie.id}
+                      overview={movie.Movie.overview}
+                      time={movie.Movie.duration}
+                      title={movie.Movie.title}
+                      wachtListId={movie.Movie.WatchLists[0]?.id}
+                      watchList={movie.Movie.WatchLists.length > 0}
+                      year={movie.Movie.release}
+                      youtubeUrl={movie.Movie.youtubeString}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </>
