@@ -1,45 +1,36 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon --watch src --ext ts,json --exec \"node --loader ts-node/esm src/index.ts\"",
-    "prebuild": "prisma generate --schema=../../prisma/schema.prisma",
     "build": "tsc",
     "start": "node dist/index.js",
     "postinstall": "prisma generate --schema=../../prisma/schema.prisma"
   },
-  "engines": {
-    "node": ">=18"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.19.0",
-    "@types/node-cron": "^3.0.11",
     "amqplib": "^0.10.3",
+    "winston": "^3.9.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
-    "express-rate-limit": "^7.5.1",
     "helmet": "^7.2.0",
+    "express-rate-limit": "^7.5.1",
     "node-cron": "^4.2.1",
     "prom-client": "^15.1.3",
     "razorpay": "^2.9.6",
-    "winston": "^3.9.0",
-    "zod": "^4.1.13"
+    "zod": "^4.1.13",
+    "prisma": "^6.19.0"
   },
   "devDependencies": {
-    "@types/amqplib": "^0.8.5",
+    "@types/amqplib": "^0.10.3",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/node": "^22.19.0",
     "nodemon": "^3.1.4",
-    "prisma": "^6.19.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }
