@@ -39,7 +39,15 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (error: any) {
     clearTimeout(timeoutId);
-    console.error("Error fetching plans from payment service:", error);
+    
+    // Only log errors during runtime, not during build time
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
+                       process.env.NEXT_PHASE === 'phase-export' ||
+                       !process.env.VERCEL_ENV && process.env.NODE_ENV === 'production';
+    
+    if (!isBuildTime) {
+      console.error("Error fetching plans from payment service:", error);
+    }
     
     // Check if it's a connection error or timeout
     if (error.name === 'AbortError' || error.code === 'ECONNREFUSED' || error.message?.includes('fetch failed')) {
