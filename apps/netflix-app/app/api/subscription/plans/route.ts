@@ -41,9 +41,10 @@ export async function GET() {
     clearTimeout(timeoutId);
     
     // Only log errors during runtime, not during build time
+    // During Vercel builds, API routes may be analyzed but external services aren't available
     const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
                        process.env.NEXT_PHASE === 'phase-export' ||
-                       !process.env.VERCEL_ENV && process.env.NODE_ENV === 'production';
+                       (error.code === 'ECONNREFUSED' && error.address === '127.0.0.1' && process.env.VERCEL === '1');
     
     if (!isBuildTime) {
       console.error("Error fetching plans from payment service:", error);
