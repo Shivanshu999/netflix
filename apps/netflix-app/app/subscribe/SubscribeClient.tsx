@@ -219,12 +219,16 @@ export function SubscribeClient({
             });
 
             if (verifyResponse.ok) {
+              const verifyData = await verifyResponse.json();
+              console.log("Payment verified:", verifyData);
+
               // Wait for subscription to be activated (RabbitMQ processing)
               // Poll subscription status with retries
               let subscriptionActive = false;
-              const maxRetries = 10; // 10 retries
+              const maxRetries = 15; // 15 retries (15 seconds)
               const retryDelay = 1000; // 1 second between retries
 
+              console.log("Waiting for subscription activation...");
               for (let i = 0; i < maxRetries; i++) {
                 try {
                   const statusResponse = await fetch("/api/subscription/status", {
@@ -237,10 +241,14 @@ export function SubscribeClient({
 
                   if (statusResponse.ok) {
                     const statusData = await statusResponse.json();
+                    console.log(`Subscription status check ${i + 1}/${maxRetries}:`, statusData);
                     if (statusData.active) {
                       subscriptionActive = true;
+                      console.log("Subscription is now active!");
                       break;
                     }
+                  } else {
+                    console.log(`Status check failed with status ${statusResponse.status}`);
                   }
                 } catch (statusError) {
                   console.log("Subscription status check failed, retrying...", statusError);
@@ -250,6 +258,10 @@ export function SubscribeClient({
                 if (i < maxRetries - 1) {
                   await new Promise((resolve) => setTimeout(resolve, retryDelay));
                 }
+              }
+
+              if (!subscriptionActive) {
+                console.warn("Subscription not activated after polling, but redirecting anyway. It may activate shortly.");
               }
 
               // Redirect to home (subscription should be active by now)

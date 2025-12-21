@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
-console.log("CURRENT DATABASE_URL =", process.env.DATABASE_URL);
   
   if (!user) {
     return NextResponse.json(
@@ -28,6 +27,20 @@ console.log("CURRENT DATABASE_URL =", process.env.DATABASE_URL);
     subscription.expiresAt > now;
   
   const active = isInTrial || isPaidActive;
+
+  // Debug logging
+  if (!active && subscription) {
+    console.log(`Subscription inactive for user ${user.id}:`, {
+      isActive: subscription.isActive,
+      expiresAt: subscription.expiresAt,
+      now: now.toISOString(),
+      trialEndsAt: subscription.trialEndsAt,
+      isInTrial,
+      isPaidActive,
+    });
+  } else if (!subscription) {
+    console.log(`No subscription found for user ${user.id}`);
+  }
 
   return NextResponse.json({
     active,
