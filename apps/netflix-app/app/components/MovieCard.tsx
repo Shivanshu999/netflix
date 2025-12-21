@@ -50,7 +50,13 @@ export function MovieCard({
 
       <div className="right-5 top-5 absolute z-10">
         {watchList ? (
-          <form action={deleteFromWatchlist as any}>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              await deleteFromWatchlist(formData);
+            }}
+          >
             <input type="hidden" name="watchlistId" value={wachtListId} />
             <input type="hidden" name="pathname" value={pathName} />
             <Button variant="outline" size="icon" type="submit">
@@ -58,7 +64,13 @@ export function MovieCard({
             </Button>
           </form>
         ) : (
-          <form action={addToWatchlist as any}>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              await addToWatchlist(formData);
+            }}
+          >
             <input type="hidden" name="movieId" value={movieId} />
             <input type="hidden" name="pathname" value={pathName} />
             <Button variant="outline" size="icon" type="submit">
