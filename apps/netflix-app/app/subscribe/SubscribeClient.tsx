@@ -219,7 +219,41 @@ export function SubscribeClient({
             });
 
             if (verifyResponse.ok) {
-              // Immediately redirect to home, don't wait
+              // Wait for subscription to be activated (RabbitMQ processing)
+              // Poll subscription status with retries
+              let subscriptionActive = false;
+              const maxRetries = 10; // 10 retries
+              const retryDelay = 1000; // 1 second between retries
+
+              for (let i = 0; i < maxRetries; i++) {
+                try {
+                  const statusResponse = await fetch("/api/subscription/status", {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    cache: "no-store",
+                  });
+
+                  if (statusResponse.ok) {
+                    const statusData = await statusResponse.json();
+                    if (statusData.active) {
+                      subscriptionActive = true;
+                      break;
+                    }
+                  }
+                } catch (statusError) {
+                  console.log("Subscription status check failed, retrying...", statusError);
+                }
+
+                // Wait before next retry
+                if (i < maxRetries - 1) {
+                  await new Promise((resolve) => setTimeout(resolve, retryDelay));
+                }
+              }
+
+              // Redirect to home (subscription should be active by now)
+              // If still not active, it will be checked again on the home page
               window.location.href = "/home";
             } else {
               // If verification fails, still redirect but log error
