@@ -1,10 +1,12 @@
 // src/utils/metrics.utils.ts
-import { Registry, Counter, Histogram, Gauge } from 'prom-client';
+import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from 'prom-client';
 
-// Create a registry to register metrics
+// Create registry
 export const register = new Registry();
 
-// HTTP Request Metrics
+// ==========================
+// HTTP Metrics
+// ==========================
 export const httpRequestDuration = new Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
@@ -20,7 +22,9 @@ export const httpRequestTotal = new Counter({
   registers: [register],
 });
 
-// Payment-specific Metrics
+// ==========================
+// Payment Metrics
+// ==========================
 export const paymentOrdersCreated = new Counter({
   name: 'payment_orders_created_total',
   help: 'Total number of payment orders created',
@@ -39,17 +43,20 @@ export const paymentOrdersAmount = new Histogram({
 export const paymentVerifications = new Counter({
   name: 'payment_verifications_total',
   help: 'Total number of payment verifications',
-  labelNames: ['status'], // success, failed
+  labelNames: ['status'],
   registers: [register],
 });
 
 export const paymentRefunds = new Counter({
   name: 'payment_refunds_total',
   help: 'Total number of payment refunds',
-  labelNames: ['status'], // success, failed
+  labelNames: ['status'],
   registers: [register],
 });
 
+// ==========================
+// Subscription Metrics
+// ==========================
 export const subscriptionCancellations = new Counter({
   name: 'subscription_cancellations_total',
   help: 'Total number of subscription cancellations',
@@ -63,7 +70,9 @@ export const subscriptionUpgrades = new Counter({
   registers: [register],
 });
 
+// ==========================
 // RabbitMQ Metrics
+// ==========================
 export const rabbitmqMessagesPublished = new Counter({
   name: 'rabbitmq_messages_published_total',
   help: 'Total number of messages published to RabbitMQ',
@@ -78,7 +87,9 @@ export const rabbitmqMessagesPublishedErrors = new Counter({
   registers: [register],
 });
 
+// ==========================
 // System Metrics
+// ==========================
 export const activeConnections = new Gauge({
   name: 'active_connections',
   help: 'Number of active connections',
@@ -93,7 +104,9 @@ export const databaseQueryDuration = new Histogram({
   registers: [register],
 });
 
+// ==========================
 // Error Metrics
+// ==========================
 export const applicationErrors = new Counter({
   name: 'application_errors_total',
   help: 'Total number of application errors',
@@ -101,7 +114,10 @@ export const applicationErrors = new Counter({
   registers: [register],
 });
 
-// Register default metrics (CPU, memory, etc.)
-import { collectDefaultMetrics } from 'prom-client';
-collectDefaultMetrics({ register });
-
+// ==========================
+// Default Node.js Metrics
+// ==========================
+collectDefaultMetrics({
+  register,
+  prefix: 'node_', // optional but recommended
+});

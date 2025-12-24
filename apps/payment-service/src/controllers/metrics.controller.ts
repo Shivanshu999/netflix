@@ -8,11 +8,12 @@ import { register } from '../utils/metrics.utils.js';
  */
 export async function getMetrics(req: Request, res: Response) {
   try {
-    res.set('Content-Type', register.contentType);
+    res.setHeader('Content-Type', register.contentType);
+    res.setHeader('Cache-Control', 'no-store'); // important
+
     const metrics = await register.metrics();
-    res.end(metrics);
-  } catch {
-    res.status(500).end('Error generating metrics');
+    res.status(200).send(metrics);
+  } catch (error) {
+    res.status(500).send('Error generating metrics');
   }
 }
-

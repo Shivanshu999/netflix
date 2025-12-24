@@ -222,51 +222,32 @@ export function SubscribeClient({
               const verifyData = await verifyResponse.json();
               console.log("Payment verified:", verifyData);
 
-              // Wait for subscription to be activated (RabbitMQ processing)
-              // Poll subscription status with retries
-              let subscriptionActive = false;
-              const maxRetries = 15; // 15 retries (15 seconds)
-              const retryDelay = 1000; // 1 second between retries
-
-              console.log("Waiting for subscription activation...");
-              for (let i = 0; i < maxRetries; i++) {
-                try {
-                  const statusResponse = await fetch("/api/subscription/status", {
-                    method: "GET",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    cache: "no-store",
-                  });
-
-                  if (statusResponse.ok) {
-                    const statusData = await statusResponse.json();
-                    console.log(`Subscription status check ${i + 1}/${maxRetries}:`, statusData);
-                    if (statusData.active) {
-                      subscriptionActive = true;
-                      console.log("Subscription is now active!");
-                      break;
-                    }
-                  } else {
-                    console.log(`Status check failed with status ${statusResponse.status}`);
+              // Subscription is now activated synchronously by the payment service
+              // Give a small delay to ensure database transaction is committed
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              
+              // Verify subscription is active before redirecting
+              try {
+                const statusCheck = await fetch("/api/subscription/status", {
+                  method: "GET",
+                  headers: { "Content-Type": "application/json" },
+                  cache: "no-store",
+                });
+                
+                if (statusCheck.ok) {
+                  const statusData = await statusCheck.json();
+                  console.log("Subscription status after payment:", statusData);
+                  
+                  if (!statusData.active) {
+                    console.warn("Subscription not active after payment verification, but redirecting anyway");
                   }
-                } catch (statusError) {
-                  console.log("Subscription status check failed, retrying...", statusError);
                 }
-
-                // Wait before next retry
-                if (i < maxRetries - 1) {
-                  await new Promise((resolve) => setTimeout(resolve, retryDelay));
-                }
+              } catch (statusError) {
+                console.error("Failed to verify subscription status:", statusError);
               }
 
-              if (!subscriptionActive) {
-                console.warn("Subscription not activated after polling, but redirecting anyway. It may activate shortly.");
-              }
-
-              // Redirect to home (subscription should be active by now)
-              // If still not active, it will be checked again on the home page
-              window.location.href = "/home";
+              // Use window.location.replace to force a hard reload and bypass cache
+              window.location.replace("/home");
             } else {
               // If verification fails, still redirect but log error
               console.error("Payment verification failed");

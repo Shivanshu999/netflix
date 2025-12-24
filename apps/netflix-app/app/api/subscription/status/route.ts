@@ -28,19 +28,20 @@ export async function GET() {
   
   const active = isInTrial || isPaidActive;
 
-  // Debug logging
-  if (!active && subscription) {
-    console.log(`Subscription inactive for user ${user.id}:`, {
-      isActive: subscription.isActive,
-      expiresAt: subscription.expiresAt,
-      now: now.toISOString(),
-      trialEndsAt: subscription.trialEndsAt,
-      isInTrial,
-      isPaidActive,
-    });
-  } else if (!subscription) {
-    console.log(`No subscription found for user ${user.id}`);
-  }
+  // Enhanced debug logging
+  console.log(`Subscription status check for user ${user.id}:`, {
+    subscriptionExists: !!subscription,
+    isActive: subscription?.isActive,
+    expiresAt: subscription?.expiresAt?.toISOString(),
+    expiresAtRaw: subscription?.expiresAt,
+    now: now.toISOString(),
+    nowRaw: now,
+    trialEndsAt: subscription?.trialEndsAt?.toISOString(),
+    isInTrial,
+    isPaidActive,
+    finalActive: active,
+    planId: subscription?.planId,
+  });
 
   return NextResponse.json({
     active,
