@@ -89,7 +89,7 @@ export async function POST() {
 
   // If refunded, end subscription immediately
   // Otherwise, cancel auto-renew but keep access until expiry
-  // If user has used more than 5 minutes, they keep access but won't be charged again
+  // Refund eligibility is determined by payment service (15-minute window from payment time)
   await prisma.subscription.update({
     where: { userId: user.id },
     data: {

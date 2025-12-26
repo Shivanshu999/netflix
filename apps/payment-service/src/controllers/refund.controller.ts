@@ -3,7 +3,7 @@ import { logger } from "../utils/logger.utils.js";
 import { razorpayClient } from "../config/razorpay.config.js";
 import { PrismaClient } from "@prisma/client";
 
-const REFUND_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+const REFUND_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const prisma = new PrismaClient();
 
 export async function refundLastPayment(

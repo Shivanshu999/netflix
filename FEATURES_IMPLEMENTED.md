@@ -45,8 +45,8 @@
 **Note:** You'll need to create subscription plans in Razorpay dashboard first, then update the service to use actual plan IDs.
 
 ### 4. Enhanced Cancel Logic
-- **Refund if payment < 5 minutes ago**: Full refund via Razorpay
-- **Cancel if payment > 5 minutes ago**: 
+- **Refund if payment < 15 minutes ago**: Full refund via Razorpay
+- **Cancel if payment > 15 minutes ago**: 
   - Cancels auto-renew (`autoRenew: false`)
   - Keeps subscription active until `expiresAt`
   - User can continue using service until expiry
@@ -143,8 +143,8 @@ Events to subscribe:
 
 4. **Test the flow:**
    - Create new subscription → Should get 7-day trial
-   - Cancel within 5 min → Should get refund
-   - Cancel after 5 min → Should cancel auto-renew but keep access
+   - Cancel within 15 min → Should get refund
+   - Cancel after 15 min → Should cancel auto-renew but keep access
    - Wait for expiry → Auto-renew should create new order
 
 5. **Monitor cron jobs:**
