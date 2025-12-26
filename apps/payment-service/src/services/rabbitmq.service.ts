@@ -61,7 +61,11 @@ export async function initRabbitMQ(): Promise<void> {
 
 export async function publishPaymentEvent(event: PaymentEvent): Promise<void> {
   if (!channel) {
-    throw new Error("RabbitMQ channel not initialized");
+    rabbitmqMessagesPublishedErrors.inc({ event_type: event.type });
+    logger.warn("RabbitMQ not ready, skipping publish", {
+      eventType: event.type,
+    });
+    return;
   }
 
   try {
