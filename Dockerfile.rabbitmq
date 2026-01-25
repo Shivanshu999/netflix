@@ -1,0 +1,21 @@
+FROM node:20-alpine AS builder
+WORKDIR /repo
+
+# Copy workspace root files
+COPY package.json package-lock.json ./
+COPY packages ./packages
+COPY apps/rabbitMQ-service ./apps/rabbitMQ-service
+
+# Install deps (workspace-aware)
+RUN npm install
+
+# Build only this service
+RUN npm run build --workspace=apps/rabbitMQ-service
+
+FROM node:20-alpine
+WORKDIR /app
+
+COPY --from=builder /repo/apps/rabbitMQ-service/dist ./dist
+COPY --from=builder /repo/node_modules ./node_modules
+
+CMD ["node", "dist/apps/rabbitMQ-service/src/index.js"]

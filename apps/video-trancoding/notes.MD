@@ -1,0 +1,1 @@
+i will upload file on temporary S3bucket -> queue se jaaega -> consumer  kaarega runTaskCommand jo production pe ECS k andar cluster  k anadar jaake ek  task ko run karega, ye task video ko transcode karega saath he sath video ko upload karega on -> production S3 bucket

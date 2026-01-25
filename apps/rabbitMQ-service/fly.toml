@@ -1,0 +1,22 @@
+# fly.toml app configuration file generated for rabbitmq-consumer on 2026-01-25T12:07:03+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'rabbitmq-consumer'
+primary_region = 'iad'
+
+[build]
+  dockerfile = "../../Dockerfile.rabbitmq"
+
+[deploy]
+  strategy = 'immediate'
+
+[processes]
+  worker = 'node dist/apps/rabbitMQ-service/src/index.js'
+
+[[vm]]
+  memory = '512'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 512
