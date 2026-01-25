@@ -1,21 +1,30 @@
+# ---------- Builder ----------
 FROM node:20-alpine AS builder
+
 WORKDIR /repo
 
-# Copy workspace root files
 COPY package.json package-lock.json ./
 COPY packages ./packages
+COPY prisma ./prisma
 COPY apps/rabbitMQ-service ./apps/rabbitMQ-service
 
-# Install deps (workspace-aware)
 RUN npm install
 
-# Build only this service
+# ✅ Prisma schema is here
+RUN npx prisma generate --schema=prisma/schema.prisma
+
 RUN npm run build --workspace=apps/rabbitMQ-service
 
+# ---------- Runtime ----------
 FROM node:20-alpine
+
 WORKDIR /app
 
+# Copy built application
 COPY --from=builder /repo/apps/rabbitMQ-service/dist ./dist
+# Copy node_modules (includes generated Prisma client)
 COPY --from=builder /repo/node_modules ./node_modules
+# Copy packages directory (needed for runtime imports)
+COPY --from=builder /repo/packages ./packages
 
 CMD ["node", "dist/apps/rabbitMQ-service/src/index.js"]
