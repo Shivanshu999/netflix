@@ -4,9 +4,13 @@ const PAYMENT_SERVICE_URL =
   process.env.PAYMENT_SERVICE_URL || "http://localhost:3002";
 
 export async function GET() {
-  // Create AbortController for timeout
+  // Debug logging
+  console.log("PAYMENT_SERVICE_URL:", PAYMENT_SERVICE_URL);
+  console.log("process.env.PAYMENT_SERVICE_URL:", process.env.PAYMENT_SERVICE_URL);
+  
+  // Create AbortController for timeout (increased to 15 seconds for Render)
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
     const response = await fetch(
@@ -52,11 +56,19 @@ export async function GET() {
     
     // Check if it's a connection error or timeout
     if (error.name === 'AbortError' || error.code === 'ECONNREFUSED' || error.message?.includes('fetch failed')) {
+      console.error("Payment service connection error:", {
+        errorName: error.name,
+        errorCode: error.code,
+        errorMessage: error.message,
+        paymentServiceUrl: PAYMENT_SERVICE_URL,
+      });
+      
       return NextResponse.json(
         { 
           success: false,
-          message: "Cannot connect to payment service. Please ensure the payment service is running on port 3002.",
-          error: error.name === 'AbortError' ? "Request timeout" : (error.message || "Connection failed")
+          message: `Cannot connect to payment service at ${PAYMENT_SERVICE_URL}. Please ensure the payment service is running and accessible.`,
+          error: error.name === 'AbortError' ? "Request timeout" : (error.message || "Connection failed"),
+          attemptedUrl: PAYMENT_SERVICE_URL
         },
         { status: 503 }
       );

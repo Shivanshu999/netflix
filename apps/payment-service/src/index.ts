@@ -19,10 +19,27 @@ const app = express();
 
 // Security Middleware
 app.use(helmet());
-app.use(cors({
-  origin: config.corsOrigin,
+
+// CORS Configuration - support multiple origins (comma-separated)
+const corsOrigins = config.corsOrigin.split(',').map(origin => origin.trim());
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list
+    if (corsOrigins.includes(origin) || corsOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      logger.warn(`CORS blocked origin: ${origin}. Allowed origins: ${corsOrigins.join(', ')}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
+logger.info(`🌐 CORS configured for origins: ${corsOrigins.join(', ')}`);
 
 // Body Parser
 app.use(express.json());

@@ -6,6 +6,7 @@ console.log('📋 Raw Environment Variables:');
 console.log('RAZORPAY_KEY_ID:', process.env.RAZORPAY_KEY_ID);
 console.log('RAZORPAY_KEY_SECRET:', process.env.RAZORPAY_KEY_SECRET ? '[HIDDEN]' : 'undefined');
 console.log('PORT:', process.env.PORT);
+console.log('CORS_ORIGIN:', process.env.CORS_ORIGIN || 'http://localhost:3000 (default)');
 
 
 
