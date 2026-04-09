@@ -13,7 +13,7 @@ interface iAppProps {
   overview: string;
   movieId: number;
   watchList: boolean;
-  wachtListId: string;
+  watchListId : string;
   youtubeUrl: string;
   year: number;
   age: number;
@@ -24,7 +24,7 @@ export function MovieCard({
   movieId,
   overview,
   title,
-  wachtListId,
+  watchListId ,
   watchList,
   youtubeUrl,
   age,
@@ -57,7 +57,7 @@ export function MovieCard({
               await deleteFromWatchlist(formData);
             }}
           >
-            <input type="hidden" name="watchlistId" value={wachtListId} />
+            <input type="hidden" name="watchlistId" value={watchListId} />
             <input type="hidden" name="pathname" value={pathName} />
             <Button variant="outline" size="icon" type="submit">
               <Heart className="w-4 h-4 text-red-500" />

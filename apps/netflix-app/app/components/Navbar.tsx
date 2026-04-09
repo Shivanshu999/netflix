@@ -22,11 +22,11 @@ interface NavbarProps {
 
 const links: linkProps[] = [
   { name: "Home", href: "/home" },
-  { name: "Tv Shows", href: "/home/shows" },
+  { name: "TV Shows", href: "/home/tv-shows" },
   {name: "Live TV", href: "/home/live-tv"},
   { name: "Movies", href: "/home/movies" },
-  { name: "Recently Added", href: "/home/recently" },
-  { name: "My List", href: "/home/user/list" },
+  { name: "Recently Added", href: "/home/recently-added" },
+  { name: "My List", href: "/home/user/my-list" },
 ];
 
 export default function Navbar({ user }: NavbarProps) {
