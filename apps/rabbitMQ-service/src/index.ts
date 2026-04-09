@@ -2,7 +2,6 @@
 import amqp from "amqplib";
 import dotenv from "dotenv";
 import { prisma } from "../../../packages/db/db.js";
-
 dotenv.config();
 console.log("CURRENT DATABASE_URL =", process.env.DATABASE_URL);
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://guest:guest@localhost:5672";

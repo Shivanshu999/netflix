@@ -8,7 +8,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    // Remove rootDir
     "noEmitOnError": false,
     "types": ["node"],
     "allowImportingTsExtensions": false,
